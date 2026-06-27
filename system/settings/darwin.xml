@@ -25,6 +25,22 @@
         </setting>
       </group>
     </category>
+    <category id="audio2">
+      <group id="1">
+        <setting id="audiooutput2.channels" help="36367" />
+      </group>
+      <group id="3">
+        <setting id="audiooutput2.eac3passthrough">
+          <visible>false</visible>
+        </setting>
+        <setting id="audiooutput2.truehdpassthrough">
+          <visible>false</visible>
+        </setting>
+        <setting id="audiooutput2.dtshdpassthrough">
+          <visible>false</visible>
+        </setting>
+      </group>
+    </category>
     <category id="input">
       <group id="3">
         <setting id="input.appleremotemode" type="integer" label="13600" help="36416">

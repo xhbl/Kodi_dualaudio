@@ -149,6 +149,24 @@
         </setting>
       </group>
     </category>
+    <category id="audio2">
+      <group id="1">
+        <setting id="audiooutput2.audiodevice" type="string">
+          <default>Default</default>
+          <visible>false</visible>
+        </setting>
+      </group>
+      <group id="3">
+        <setting id="audiooutput2.passthroughdevice" type="string">
+          <default>Default</default>
+          <visible>false</visible>
+        </setting>
+        <setting id="audiooutput2.supportdtshdcpudecoding" type="boolean">
+          <default>false</default>
+          <visible>false</visible>
+        </setting>
+      </group>
+    </category>
     <category id="powermanagement">
       <group id="1">
         <visible>false</visible>

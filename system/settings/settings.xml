@@ -3385,6 +3385,361 @@
         </setting>
       </group>
     </category>
+    <category id="audio2" label="14221" help="36360">
+      <group id="0">
+        <setting id="audiooutput2.enabled" type="boolean" label="449" help="449">
+          <level>0</level>
+          <default>false</default>
+          <control type="toggle" />
+        </setting>
+      </group>
+      <group id="1" label="14250">
+        <setting id="audiooutput2.audiodevice" type="string" label="545" help="36371">
+          <level>0</level>
+          <default>Default</default> <!-- will be properly set on startup -->
+          <dependencies>
+            <dependency type="enable" setting="audiooutput2.enabled" operator="is">true</dependency>
+          </dependencies>
+          <constraints>
+            <options>audiodevices</options>
+          </constraints>
+          <control type="list" format="string" />
+          <updates>
+            <update type="change" />
+          </updates>
+        </setting>
+        <setting id="audiooutput2.channels" type="integer" label="34100" help="36362">
+          <level>0</level>
+          <default>1</default> <!-- AE_CH_LAYOUT_2_0 -->
+          <dependencies>
+            <dependency type="visible" on="property" name="aesettingvisible2" setting="audiooutput2.audiodevice">audiooutput2.channels</dependency>
+            <dependency type="enable" setting="audiooutput2.enabled" operator="is">true</dependency>
+          </dependencies>
+          <constraints>
+            <options>
+              <option label="34101">1</option> <!-- AE_CH_LAYOUT_2_0 -->
+              <option label="34102">2</option> <!-- AE_CH_LAYOUT_2_1 -->
+              <option label="34103">3</option> <!-- AE_CH_LAYOUT_3_0 -->
+              <option label="34104">4</option> <!-- AE_CH_LAYOUT_3_1 -->
+              <option label="34105">5</option> <!-- AE_CH_LAYOUT_4_0 -->
+              <option label="34106">6</option> <!-- AE_CH_LAYOUT_4_1 -->
+              <option label="34107">7</option> <!-- AE_CH_LAYOUT_5_0 -->
+              <option label="34108">8</option> <!-- AE_CH_LAYOUT_5_1 -->
+              <option label="34109">9</option> <!-- AE_CH_LAYOUT_7_0 -->
+              <option label="34110">10</option> <!-- AE_CH_LAYOUT_7_1 -->
+            </options>
+          </constraints>
+          <control type="list" format="string" />
+        </setting>
+        <setting id="audiooutput2.config" type="integer" label="337" help="36361">
+          <level>2</level>
+          <default>2</default>
+          <dependencies>
+            <dependency type="enable" setting="audiooutput2.enabled" operator="is">true</dependency>
+          </dependencies>
+          <constraints>
+            <options>
+              <option label="338">1</option>
+              <option label="339">2</option>
+              <option label="420">3</option>
+            </options>
+          </constraints>
+          <control type="list" format="integer" />
+        </setting>
+        <setting id="audiooutput2.volumesteps" type="integer" label="1302" help="36442">
+          <level>1</level>
+          <default>90</default>
+          <dependencies>
+            <dependency type="enable" setting="audiooutput2.enabled" operator="is">true</dependency>
+          </dependencies>
+          <constraints>
+            <minimum>10</minimum>
+            <step>5</step>
+            <maximum>90</maximum>
+          </constraints>
+          <control type="list" format="integer" />
+        </setting>
+        <setting id="audiooutput2.maintainoriginalvolume" type="boolean" label="346" help="36533">
+          <level>2</level>
+          <default>true</default>
+          <dependencies>
+            <dependency type="enable" setting="audiooutput2.enabled" operator="is">true</dependency>
+          </dependencies>
+          <control type="toggle" />
+        </setting>
+        <setting id="audiooutput2.stereoupmix" type="boolean" label="252" help="36364">
+          <level>2</level>
+          <default>false</default>
+          <dependencies>
+            <dependency type="visible" on="property" name="aesettingvisible2" setting="audiooutput2.channels">audiooutput2.stereoupmix</dependency>
+            <dependency type="enable" setting="audiooutput2.enabled" operator="is">true</dependency>
+          </dependencies>
+          <control type="toggle" />
+        </setting>
+        <setting id="audiooutput2.processquality" type="integer" label="13505" help="36169">
+          <requirement>HAS_AE_QUALITY_LEVELS</requirement>
+          <level>2</level>
+          <default>30</default> <!-- AE_QUALITY_MID -->
+          <dependencies>
+            <dependency type="enable" setting="audiooutput2.enabled" operator="is">true</dependency>
+          </dependencies>
+          <constraints>
+            <options>aequalitylevels</options>
+          </constraints>
+          <control type="list" format="string" />
+        </setting>
+        <setting id="audiooutput2.atempothreshold" type="integer" label="13517" help="13518">
+          <level>3</level>
+          <default>2</default> <!-- 2% -->
+          <dependencies>
+            <dependency type="enable" setting="audiooutput2.enabled" operator="is">true</dependency>
+          </dependencies>
+          <constraints>
+            <minimum>0</minimum>
+            <step>1</step>
+            <maximum>100</maximum>
+          </constraints>
+          <control type="edit" format="integer" />
+        </setting>
+        <setting id="audiooutput2.samplerate" type="integer" label="458" help="36523">
+          <level>2</level>
+          <default>48000</default>
+          <dependencies>
+            <dependency type="visible">
+              <and>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.audiodevice">audiooutput2.samplerate</condition>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.config">audiooutput2.samplerate</condition>
+              </and>
+            </dependency>
+            <dependency type="enable" setting="audiooutput2.enabled" operator="is">true</dependency>
+          </dependencies>
+          <constraints>
+            <options>
+              <option label="34124">44100</option>
+              <option label="34125">48000</option>
+              <option label="34126">88200</option>
+              <option label="34127">96000</option>
+              <option label="34128">192000</option>
+              <option label="34129">352800</option>
+              <option label="34130">384000</option>
+            </options>
+          </constraints>
+          <control type="list" format="integer" />
+        </setting>
+        <setting id="audiooutput2.streamsilence" type="integer" label="421" help="34111">
+          <level>2</level>
+          <default>1</default>
+          <dependencies>
+            <dependency type="enable" setting="audiooutput2.enabled" operator="is">true</dependency>
+          </dependencies>
+          <constraints>
+            <options>audiostreamsilence2</options>
+          </constraints>
+          <control type="list" format="string" />
+        </setting>
+        <setting id="audiooutput2.streamnoise" type="boolean" label="34112" help="34113">
+          <level>2</level>
+          <default>true</default>
+          <dependencies>
+            <dependency type="enable" setting="audiooutput2.enabled" operator="is">true</dependency>
+          </dependencies>
+          <control type="toggle" />
+        </setting>
+      </group>
+      <group id="2" label="15108">
+        <setting id="audiooutput2.guisoundmode" type="integer" label="34120" help="36373">
+          <level>0</level>
+          <default>1</default> <!-- AE_SOUND_IDLE -->
+          <dependencies>
+            <dependency type="enable" setting="audiooutput2.enabled" operator="is">true</dependency>
+          </dependencies>
+          <constraints>
+            <options>
+              <option label="34121">1</option> <!-- AE_SOUND_IDLE -->
+              <option label="34122">2</option> <!-- AE_SOUND_ALWAYS -->
+              <option label="34123">0</option> <!-- AE_SOUND_OFF -->
+            </options>
+          </constraints>
+          <control type="list" format="string" />
+        </setting>
+        <setting id="audiooutput2.guisoundvolume" type="integer" label="13376" help="39176">
+          <level>1</level>
+          <default>100</default>
+          <dependencies>
+            <dependency type="enable" setting="audiooutput2.enabled" operator="is">true</dependency>
+          </dependencies>
+          <control type="slider" format="percentage" range="0,100" />
+        </setting>
+      </group>
+      <group id="3" label="14252">
+        <setting id="audiooutput2.passthrough" type="boolean" label="348" help="36368">
+          <level>1</level>
+          <default>false</default>
+          <dependencies>
+            <dependency type="visible">
+              <and>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.audiodevice">audiooutput2.passthrough</condition>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.config">audiooutput2.passthrough</condition>
+              </and>
+            </dependency>
+            <dependency type="enable" setting="audiooutput2.enabled" operator="is">true</dependency>
+          </dependencies>
+          <control type="toggle" />
+        </setting>
+        <setting id="audiooutput2.passthroughdevice" type="string" label="546" help="36372">
+          <level>1</level>
+          <default>Default</default> <!-- will be properly set on startup -->
+          <dependencies>
+            <dependency type="visible">
+              <and>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.passthrough">audiooutput2.passthrough</condition>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.config">audiooutput2.passthrough</condition>
+              </and>
+            </dependency>
+            <dependency type="enable">
+              <and>
+                <condition setting="audiooutput2.enabled" operator="is">true</condition>
+                <condition setting="audiooutput2.passthrough" operator="is">true</condition>
+              </and>
+            </dependency>
+          </dependencies>
+          <constraints>
+            <options>audiodevicespassthrough</options>
+          </constraints>
+          <control type="list" format="string" />
+        </setting>
+        <setting id="audiooutput2.ac3passthrough" type="boolean" label="364" help="36365">
+          <level>2</level>
+          <default>true</default>
+          <dependencies>
+            <dependency type="visible" on="property" name="aesettingvisible2" setting="audiooutput2.config">audiooutput2.passthrough</dependency>
+            <dependency type="enable">
+              <and>
+                <condition setting="audiooutput2.enabled" operator="is">true</condition>
+                <condition setting="audiooutput2.passthrough" operator="is">true</condition>
+              </and>
+            </dependency>
+          </dependencies>
+          <control type="toggle" />
+        </setting>
+        <setting id="audiooutput2.ac3transcode" type="boolean" parent="audiooutput2.ac3passthrough" label="667" help="36429">
+          <level>2</level>
+          <default>false</default>
+          <dependencies>
+            <dependency type="enable">
+              <and>
+                <condition setting="audiooutput2.enabled" operator="is">true</condition>
+                <condition setting="audiooutput2.passthrough" operator="is">true</condition>
+                <condition setting="audiooutput2.ac3passthrough" operator="is">true</condition>
+              </and>
+            </dependency>
+            <dependency type="visible">
+              <and>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.config">audiooutput2.ac3transcode</condition>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.channels">audiooutput2.ac3transcode</condition>
+              </and>
+            </dependency>
+          </dependencies>
+          <control type="toggle" />
+        </setting>
+        <setting id="audiooutput2.eac3passthrough" type="boolean" label="448" help="37016">
+          <level>2</level>
+          <default>false</default>
+          <dependencies>
+            <dependency type="visible">
+              <and>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput.config">audiooutput.eac3passthrough</condition>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput.passthroughdevice">audiooutput.eac3passthrough</condition>
+              </and>
+            </dependency>
+            <dependency type="enable">
+              <and>
+                <condition setting="audiooutput2.enabled" operator="is">true</condition>
+                <condition setting="audiooutput2.passthrough" operator="is">true</condition>
+              </and>
+            </dependency>
+          </dependencies>
+          <control type="toggle" />
+        </setting>
+        <setting id="audiooutput2.dtspassthrough" type="boolean" label="254" help="36366">
+          <level>2</level>
+          <default>false</default>
+          <dependencies>
+            <dependency type="visible">
+              <and>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.config">audiooutput2.dtspassthrough</condition>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.passthroughdevice">audiooutput2.dtspassthrough</condition>
+              </and>
+            </dependency>
+            <dependency type="enable">
+              <and>
+                <condition setting="audiooutput2.enabled" operator="is">true</condition>
+                <condition setting="audiooutput2.passthrough" operator="is">true</condition>
+              </and>
+            </dependency>
+          </dependencies>
+          <control type="toggle" />
+        </setting>
+        <setting id="audiooutput2.truehdpassthrough" type="boolean" label="349" help="36369">
+          <level>2</level>
+          <default>false</default>
+          <dependencies>
+            <dependency type="visible">
+              <and>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.config">audiooutput2.truehdpassthrough</condition>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.passthroughdevice">audiooutput2.truehdpassthrough</condition>
+              </and>
+            </dependency>
+            <dependency type="enable">
+              <and>
+                <condition setting="audiooutput2.enabled" operator="is">true</condition>
+                <condition setting="audiooutput2.passthrough" operator="is">true</condition>
+              </and>
+            </dependency>
+          </dependencies>
+          <control type="toggle" />
+        </setting>
+        <setting id="audiooutput2.dtshdpassthrough" type="boolean" label="347" help="36370">
+          <level>2</level>
+          <default>false</default>
+          <dependencies>
+            <dependency type="visible">
+              <and>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.config">audiooutput2.dtshdpassthrough</condition>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.passthroughdevice">audiooutput2.dtshdpassthrough</condition>
+              </and>
+            </dependency>
+            <dependency type="enable">
+              <and>
+                <condition setting="audiooutput2.enabled" operator="is">true</condition>
+                <condition setting="audiooutput2.passthrough" operator="is">true</condition>
+              </and>
+            </dependency>
+          </dependencies>
+          <control type="toggle" />
+        </setting>
+        <setting id="audiooutput2.dtshdcorefallback" type="boolean" parent="audiooutput2.dtshdpassthrough" label="2203" help="2204">
+          <level>2</level>
+          <default>true</default>
+          <dependencies>
+            <dependency type="visible">
+              <and>
+                <condition setting="audiooutput2.dtshdpassthrough" operator="is">false</condition>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.config">audiooutput2.dtshdpassthrough</condition>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.passthroughdevice">audiooutput2.dtshdpassthrough</condition>
+              </and>
+            </dependency>
+            <dependency type="enable">
+              <and>
+                <condition setting="audiooutput2.enabled" operator="is">true</condition>
+                <condition setting="audiooutput2.passthrough" operator="is">true</condition>
+              </and>
+            </dependency>
+          </dependencies>
+          <control type="toggle" />
+        </setting>
+      </group>
+    </category>
     <category id="input" label="14125" help="36374">
       <group id="1" label="35000">
         <setting id="input.peripherals" type="action" label="35000" help="36375">
