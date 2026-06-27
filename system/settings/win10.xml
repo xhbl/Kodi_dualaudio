@@ -30,6 +30,20 @@
         </setting>
       </group>
     </category>
+    <category id="audio2">
+      <group id="1">
+        <setting id="audiooutput2.audiodevice">
+          <level>0</level>
+          <default>XAUDIO:default</default>
+        </setting>
+      </group>
+      <group id="3">
+        <setting id="audiooutput2.passthroughdevice">
+          <level>1</level>
+          <default>WASAPI:default</default>
+        </setting>
+      </group>
+    </category>
   </section>
   <section id="pvr">
     <category id="pvrpowermanagement">

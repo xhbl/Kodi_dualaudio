@@ -48,6 +48,36 @@
         </setting>
       </group>
     </category>
+    <category id="audio2">
+      <group id="1">
+        <setting id="audiooutput2.audiodevice" type="string" label="545" help="36371">
+          <level>0</level>
+          <default>DIRECTSOUND:default</default>
+          <constraints>
+            <options>audiodevices</options>
+          </constraints>
+          <control type="list" format="string" />
+        </setting>
+      </group>
+      <group id="3">
+        <setting id="audiooutput2.passthroughdevice" type="string" label="546" help="36372">
+          <level>1</level>
+          <default>DIRECTSOUND:default</default>
+          <constraints>
+            <options>audiodevicespassthrough</options>
+          </constraints>
+          <dependencies>
+            <dependency type="visible">
+              <and>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.audiodevice">audiooutput2.passthrough</condition>
+                <condition on="property" name="aesettingvisible2" setting="audiooutput2.config">audiooutput2.passthrough</condition>
+              </and>
+            </dependency>
+          </dependencies>
+          <control type="list" format="string" />
+        </setting>
+      </group>
+    </category>
     <category id="display">
       <group id="1">
         <setting id="videoscreen.limitedrange" type="boolean" label="36042" help="36359">
