@@ -17,8 +17,9 @@
 
 using namespace ActiveAE;
 
-CSoundPacket::CSoundPacket(const SampleConfig& conf, int samples) : config(conf)
+CSoundPacket::CSoundPacket(const SampleConfig& conf, int samples, bool bAudio2) : config(conf)
 {
+  m_bAudio2 = bAudio2;
   data = CActiveAE::AllocSoundSample(config, samples, bytes_per_sample, planes, linesize);
   max_nb_samples = samples;
   nb_samples = 0;
@@ -44,8 +45,10 @@ void CSampleBuffer::Return()
     pool->ReturnBuffer(this);
 }
 
-CActiveAEBufferPool::CActiveAEBufferPool(const AEAudioFormat& format) : m_format(format)
+CActiveAEBufferPool::CActiveAEBufferPool(const AEAudioFormat& format, bool bAudio2) : m_format(format)
 {
+  m_bAudio2 = bAudio2;
+
   if (m_format.m_dataFormat == AE_FMT_RAW)
   {
     m_format.m_frameSize = 1;
@@ -109,7 +112,7 @@ bool CActiveAEBufferPool::Create(unsigned int totaltime)
   {
     buffer = new CSampleBuffer();
     buffer->pool = this;
-    buffer->pkt = std::make_unique<CSoundPacket>(config, m_format.m_frames);
+    buffer->pkt = std::make_unique<CSoundPacket>(config, m_format.m_frames, m_bAudio2);
 
     m_allSamples.push_back(buffer);
     m_freeSamples.push_back(buffer);

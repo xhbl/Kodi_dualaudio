@@ -124,5 +124,6 @@ void CALSADeviceMonitor::FDEventCallback(int id, int fd, short revents, void *da
   if (audioDevicesChanged)
   {
     CServiceBroker::GetActiveAE()->DeviceChange();
+    if(CServiceBroker::GetActiveAE(true)) CServiceBroker::GetActiveAE(true)->DeviceChange();
   }
 }

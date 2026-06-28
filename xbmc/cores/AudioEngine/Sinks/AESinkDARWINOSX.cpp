@@ -126,6 +126,9 @@ OSStatus deviceChangedCB(AudioObjectID                       inObjectID,
     IAE* ae = CServiceBroker::GetActiveAE();
     if (ae)
       ae->DeviceChange();
+    IAE* ae2 = CServiceBroker::GetActiveAE(true);
+    if (ae2)
+      ae2->DeviceChange();
     CLog::Log(LOGDEBUG, "CoreAudio: audiodevicelist changed - done");
   }
   return noErr;

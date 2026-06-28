@@ -53,7 +53,8 @@ class IAEStream
 {
 protected:
   friend class IAE;
-  IAEStream() = default;
+  bool m_bAudio2;
+  IAEStream() { m_bAudio2 = false; }
   virtual ~IAEStream() = default;
 
 public:
@@ -268,5 +269,9 @@ public:
    * Slave a stream to resume when this stream has drained
    */
   virtual void RegisterSlave(IAEStream *stream) = 0;
+
+  void SetAudio2(bool bAudio2){ m_bAudio2 = bAudio2; }
+
+  bool IsAudio2(){ return m_bAudio2; }
 };
 

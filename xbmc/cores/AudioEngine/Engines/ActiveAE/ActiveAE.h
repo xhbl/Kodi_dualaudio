@@ -238,7 +238,7 @@ protected:
   friend class CActiveAEBufferPoolResample;
 
 public:
-  CActiveAE();
+  CActiveAE(bool bAudio2 = false);
   ~CActiveAE() override;
   void Start() override;
   void Shutdown() override;
@@ -253,6 +253,7 @@ public:
   void SetVolume(const float volume) override;
   void SetMute(const bool enabled) override;
   bool IsMuted() override;
+  virtual bool  IsDumb() { return m_bDumb; }
 
   /* returns a new stream for data in the specified format */
   IAE::StreamPtr MakeStream(AEAudioFormat& audioFormat,
@@ -263,6 +264,7 @@ public:
   IAE::SoundPtr MakeSound(const std::string& file) override;
 
   void EnumerateOutputDevices(AEDeviceList &devices, bool passthrough) override;
+  virtual std::string GetCreateDevice() {return m_currDevice;}
   bool SupportsRaw(AEAudioFormat &format) override;
   bool SupportsSilenceTimeout() override;
   bool UsesDtsCoreFallback() override;
@@ -316,6 +318,10 @@ protected:
   void UnconfigureSink();
   void Dispose();
   void LoadSettings();
+  void LoadSettings2();
+  void CheckDevice1(bool bPreInitSink);
+  void CheckDevice2(bool bPreInitSink);
+  bool IsSettingVisible2(const std::string &settingId);
   void ValidateOutputDevices(bool saveChanges);
   void HandleDeviceCountChange(const std::string& driver, bool defaultDeviceChanged);
   bool NeedReconfigureBuffers();
@@ -424,5 +430,11 @@ protected:
 
   float m_targetBufferLevel{0.0f};
   float m_initialTargetBufferLevel{0.0f};
+
+  bool m_bDumb;
+  std::string m_device_sv;
+  std::string m_passthroughdevice_sv;
+  static bool m_bFirstSinkOK;
+  static CCriticalSection m_sinkLock;
 };
 };

@@ -28,7 +28,7 @@ namespace ActiveAE
 class CSoundPacket
 {
 public:
-  CSoundPacket(const SampleConfig& conf, int samples);
+  CSoundPacket(const SampleConfig& conf, int samples, bool bAudio2 = false);
   ~CSoundPacket();
   uint8_t **data;                        // array with pointers to planes of data
   SampleConfig config;
@@ -38,6 +38,8 @@ public:
   int nb_samples;                        // number of frames used
   int max_nb_samples;                    // max number of frames this packet can hold
   int pause_burst_ms;
+protected:
+  bool m_bAudio2;
 };
 
 class CActiveAEBufferPool;
@@ -60,7 +62,7 @@ public:
 class CActiveAEBufferPool
 {
 public:
-  explicit CActiveAEBufferPool(const AEAudioFormat& format);
+  explicit CActiveAEBufferPool(const AEAudioFormat& format, bool bAudio2 = false);
   virtual ~CActiveAEBufferPool();
   virtual bool Create(unsigned int totaltime);
   CSampleBuffer *GetFreeBuffer();
@@ -68,6 +70,8 @@ public:
   AEAudioFormat m_format;
   std::deque<CSampleBuffer*> m_allSamples;
   std::deque<CSampleBuffer*> m_freeSamples;
+protected:
+  bool m_bAudio2;
 };
 
 class IAEResample;

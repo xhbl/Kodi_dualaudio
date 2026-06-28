@@ -10,12 +10,14 @@
 
 #include "Interfaces/AESink.h"
 #include "ServiceBroker.h"
+#include "Sinks/AESinkNULL.h"
 #include "utils/StringUtils.h"
 #include "utils/log.h"
 
 #include <algorithm>
 
 using namespace AE;
+using namespace std::chrono_literals;
 
 std::map<std::string, AESinkRegEntry> CAESinkFactory::m_AESinkRegEntry;
 
@@ -26,6 +28,9 @@ void CAESinkFactory::RegisterSink(const AESinkRegEntry& regEntry)
   IAE *ae = CServiceBroker::GetActiveAE();
   if (ae)
     ae->DeviceChange();
+  IAE *ae2 = CServiceBroker::GetActiveAE(true);
+  if (ae2)
+    ae2->DeviceChange();
 }
 
 void CAESinkFactory::ClearSinks()
@@ -79,6 +84,14 @@ AESinkDevice CAESinkFactory::ParseDevice(const std::string& device)
 
 std::unique_ptr<IAESink> CAESinkFactory::Create(std::string& device, AEAudioFormat& desiredFormat)
 {
+  // the 2nd audio engine falls back to "NULL" when it is disabled or when it would
+  // conflict with the 1st audio engine, a sink that discards everything it is given
+  if (device == "NULL")
+  {
+    CLog::LogF(LOGDEBUG, "opening NULL sink, output is discarded");
+    return std::make_unique<CAESinkNULL>(0s, 0s);
+  }
+
   // extract the driver from the device string if it exists
   const AESinkDevice dev = ParseDevice(device);
 
