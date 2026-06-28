@@ -500,6 +500,7 @@ void CSettingConditions::Initialize()
   m_complexConditions.emplace("profilehasvideoslocked", ProfileHasVideosLocked);
   m_complexConditions.emplace("profilelockmode", ProfileLockMode);
   m_complexConditions.emplace("aesettingvisible", ActiveAE::CActiveAESettings::IsSettingVisible);
+  m_complexConditions.emplace("aesettingvisible2", ActiveAE::CActiveAESettings::IsSettingVisible);
   m_complexConditions.emplace("gt", GreaterThan);
   m_complexConditions.emplace("gte", GreaterThanOrEqual);
   m_complexConditions.emplace("lt", LessThan);
