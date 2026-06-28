@@ -482,6 +482,8 @@ void CSettingConditions::Initialize()
   m_complexConditions.try_emplace("profilelockmode", ProfileLockMode);
   m_complexConditions.try_emplace("aesettingvisible",
                                   ActiveAE::CActiveAESettings::IsSettingVisible);
+  m_complexConditions.try_emplace("aesettingvisible2",
+                                  ActiveAE::CActiveAESettings::IsSettingVisible);
   m_complexConditions.try_emplace("gt", GreaterThan);
   m_complexConditions.try_emplace("gte", GreaterThanOrEqual);
   m_complexConditions.try_emplace("lt", LessThan);
