@@ -25,6 +25,8 @@ using namespace AE;
 using namespace ActiveAE;
 using namespace std::chrono_literals;
 
+#define STR_2ND (m_bAudio2 ? " 2nd" : "")
+
 CActiveAESink::CActiveAESink(CEvent* inMsgEvent)
   : CThread("AESink"),
     m_controlPort("SinkControlPort", inMsgEvent, &m_outMsgEvent),
@@ -36,6 +38,7 @@ CActiveAESink::CActiveAESink(CEvent* inMsgEvent)
   m_stats = nullptr;
   m_volume = 0.0;
   m_streamNoise = true;
+  m_bAudio2 = false;
 }
 
 CActiveAESink::~CActiveAESink() = default;
@@ -281,6 +284,7 @@ void CActiveAESink::StateMachine(int signal, Protocol *port, Message *msg)
             reply.cacheTotal = m_sink->GetCacheTotal();
             reply.latency = m_sink->GetLatency();
             reply.hasVolume = m_sink->HasVolume();
+            reply.isNull = (std::string(m_sink->GetName()) == "NULL");
             m_state = S_TOP_CONFIGURED_IDLE;
             m_extTimeout = 10s;
             m_sinkLatency = (int64_t)(reply.latency * 1000);
@@ -934,7 +938,7 @@ void CActiveAESink::OpenSink()
 
   // WARNING: this changes format and does not use passthrough
   m_sinkFormat = m_requestedFormat;
-  CLog::Log(LOGDEBUG, "CActiveAESink::OpenSink - trying to open device {}", device);
+  CLog::Log(LOGDEBUG, "CActiveAESink::OpenSink{} - trying to open device {}", STR_2ND, device);
   m_sink = CAESinkFactory::Create(device, m_sinkFormat);
 
   // try first device in out list
@@ -945,13 +949,13 @@ void CActiveAESink::OpenSink()
     GetDeviceFriendlyName(dev.name);
     device = dev.driver.empty() ? dev.name : dev.driver + ":" + dev.name;
     m_sinkFormat = m_requestedFormat;
-    CLog::Log(LOGDEBUG, "CActiveAESink::OpenSink - trying to open device {}", device);
+    CLog::Log(LOGDEBUG, "CActiveAESink::OpenSink{} - trying to open device {}", STR_2ND, device);
     m_sink = CAESinkFactory::Create(device, m_sinkFormat);
   }
 
   if (!m_sink)
   {
-    CLog::Log(LOGERROR, "CActiveAESink::OpenSink - no sink was returned");
+    CLog::Log(LOGERROR, "CActiveAESink::OpenSink{} - no sink was returned", STR_2ND);
     m_extError = true;
     return;
   }
@@ -970,7 +974,7 @@ void CActiveAESink::OpenSink()
     m_sinkFormat.m_dataFormat = AE_FMT_S32NE;
 #endif
 
-  CLog::Log(LOGDEBUG, "CActiveAESink::OpenSink - {} Initialized:", m_sink->GetName());
+  CLog::Log(LOGDEBUG, "CActiveAESink::OpenSink{} - {} Initialized:", STR_2ND, m_sink->GetName());
   CLog::Log(LOGDEBUG, "  Output Device : {}", m_deviceFriendlyName);
   CLog::Log(LOGDEBUG, "  Sample Rate   : {}", m_sinkFormat.m_sampleRate);
   CLog::Log(LOGDEBUG, "  Sample Format : {}", CAEUtil::DataFormatToStr(m_sinkFormat.m_dataFormat));
@@ -989,7 +993,7 @@ void CActiveAESink::OpenSink()
   config.sample_rate = m_sinkFormat.m_sampleRate;
 
   // init sample of silence/noise
-  m_sampleOfSilence.pkt = std::make_unique<CSoundPacket>(config, m_sinkFormat.m_frames);
+  m_sampleOfSilence.pkt = std::make_unique<CSoundPacket>(config, m_sinkFormat.m_frames, m_bAudio2);
   m_sampleOfSilence.pkt->nb_samples = m_sampleOfSilence.pkt->max_nb_samples;
   if (!passthrough)
     GenerateNoise();

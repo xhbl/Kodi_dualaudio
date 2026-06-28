@@ -91,7 +91,7 @@ bool CAEEncoderFFmpeg::Initialize(AEAudioFormat &format, bool allow_planar_input
 {
   Reset();
 
-  bool ac3 = CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_AUDIOOUTPUT_AC3PASSTHROUGH);
+  bool ac3 = CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(!m_bAudio2 ? CSettings::SETTING_AUDIOOUTPUT_AC3PASSTHROUGH : CSettings::SETTING_AUDIOOUTPUT2_AC3PASSTHROUGH);
 
   const AVCodec* codec = nullptr;
 

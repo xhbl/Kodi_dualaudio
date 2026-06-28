@@ -61,9 +61,11 @@ protected:
       std::vector<StringSettingOption>& list,
       std::string& current,
       bool passthrough);
+  static bool IsSettingAudio2(const std::shared_ptr<const CSetting>& setting);
 
   CActiveAE &m_audioEngine;
   CCriticalSection m_cs;
   static CActiveAESettings* m_instance;
+  static CActiveAESettings* m_instance2;
 };
 };

@@ -82,7 +82,7 @@ class IAE
 {
 protected:
 
-  IAE() = default;
+  IAE() { m_bAudio2 = false; m_bDisabled = false; }
   virtual ~IAE() = default;
 
   /*!
@@ -155,6 +155,7 @@ public:
    * \return The current mute state
    */
   virtual bool IsMuted() = 0;
+  virtual bool IsDumb() = 0;
 
   /*!
    * \brief Creates and returns a new IAEStream in the format specified, this function should never fail
@@ -185,6 +186,8 @@ public:
    * \param passthrough True if only passthrough devices are wanted
    */
   virtual void EnumerateOutputDevices(AEDeviceList &devices, bool passthrough) = 0;
+
+  virtual std::string GetCreateDevice() { return ""; }
 
   /*!
    * \brief Returns true if the AudioEngine supports AE_FMT_RAW streams for use with formats such as IEC61937
@@ -288,6 +291,16 @@ private:
    * \param sound The IAESound object to free
    */
   virtual void FreeSound(IAESound* sound) = 0;
+
+protected:
+  bool m_bAudio2;
+  bool m_bDisabled;
+
+public:
+  void SetAudio2(bool bAudio2){ m_bAudio2 = bAudio2; }
+  bool IsAudio2(){ return m_bAudio2; }
+  void SetDisabled(bool bDisabled){ m_bDisabled = bDisabled; }
+  bool IsDisabled(){ return m_bDisabled; }
 };
 
 class IAEStreamDeleter

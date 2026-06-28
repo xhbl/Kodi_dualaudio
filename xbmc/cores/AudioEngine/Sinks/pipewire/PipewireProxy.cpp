@@ -47,6 +47,9 @@ void CPipewireProxy::Bound(void* userdata, uint32_t id)
   auto AE = CServiceBroker::GetActiveAE();
   if (AE)
     AE->DeviceCountChange("PIPEWIRE");
+  auto AE2 = CServiceBroker::GetActiveAE(true);
+  if (AE2)
+    AE2->DeviceCountChange("PIPEWIRE");
 }
 
 void CPipewireProxy::Removed(void* userdata)
@@ -56,6 +59,9 @@ void CPipewireProxy::Removed(void* userdata)
   auto AE = CServiceBroker::GetActiveAE();
   if (AE)
     AE->DeviceCountChange("PIPEWIRE");
+  auto AE2 = CServiceBroker::GetActiveAE(true);
+  if (AE2)
+    AE2->DeviceCountChange("PIPEWIRE");
 }
 
 pw_proxy_events CPipewireProxy::CreateProxyEvents()

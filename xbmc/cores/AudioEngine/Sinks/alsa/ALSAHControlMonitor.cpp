@@ -117,6 +117,7 @@ int CALSAHControlMonitor::HCTLCallback(snd_hctl_elem_t *elem, unsigned int mask)
      * Custom callbacks for handling other control monitoring may be implemented when needed.
      */
     CServiceBroker::GetActiveAE()->DeviceChange();
+    if(CServiceBroker::GetActiveAE(true)) CServiceBroker::GetActiveAE(true)->DeviceChange();
   }
 
   return 0;

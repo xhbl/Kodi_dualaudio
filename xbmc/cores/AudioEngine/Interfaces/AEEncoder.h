@@ -23,7 +23,7 @@ public:
   /**
    * Constructor
    */
-  IAEEncoder() = default;
+  IAEEncoder() { m_bAudio2 = false; };
 
   /**
    * Destructor
@@ -91,5 +91,10 @@ public:
    * @return the delay in seconds including any un-fetched encoded data
    */
   virtual double GetDelay(unsigned int bufferSize) = 0;
+
+  void SetAudio2(bool bAudio2){ m_bAudio2 = bAudio2; }
+
+  protected:
+	bool m_bAudio2;
 };
 
