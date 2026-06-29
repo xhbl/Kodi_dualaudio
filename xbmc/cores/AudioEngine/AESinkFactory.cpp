@@ -84,14 +84,12 @@ std::unique_ptr<IAESink> CAESinkFactory::Create(const std::string& device,
                                                 AEAudioFormat& desiredFormat)
 {
   // extract the driver from the device string if it exists
-  const AESinkDevice dev = ParseDevice(device);
+  AESinkDevice dev = ParseDevice(device);
+  if (device == "NULL") dev.driver = "NULL";
 
   AEAudioFormat tmpFormat = desiredFormat;
   std::unique_ptr<IAESink> sink;
   std::string tmpDevice = dev.name;
-
-  if (device == "NULL")
-    driver = "NULL";
 
   for (const auto& reg : m_AESinkRegEntry)
   {

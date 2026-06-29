@@ -2773,16 +2773,13 @@ void CActiveAE::CheckDevice2(bool bPreInitSink)
     // avoid conflict with 1st audio
     std::string device1 = "";
     if(CServiceBroker::GetActiveAE())
-        device1 = CServiceBroker::GetActiveAE()->GetCreateDevice();
-    std::string device, driver;
-    device = m_settings.device;
-    CAESinkFactory::ParseDevice(device, driver);
+      device1 = CServiceBroker::GetActiveAE()->GetCreateDevice();
+    std::string device = CAESinkFactory::ParseDevice(m_settings.device).name;
     if(device == device1)
       m_settings.device = "NULL";
-    device = m_settings.passthroughdevice;
-    CAESinkFactory::ParseDevice(device, driver);
+    device = CAESinkFactory::ParseDevice(m_settings.passthroughdevice).name;
     if(device == device1)
-    m_settings.passthroughdevice = "NULL";
+      m_settings.passthroughdevice = "NULL";
   }
 }
 
