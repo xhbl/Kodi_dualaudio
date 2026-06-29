@@ -66,14 +66,14 @@ public:
   bool IsVideoInterlaced();
 
   // player audio info
-  void SetAudioDecoderName(std::string name);
-  std::string GetAudioDecoderName();
-  void SetAudioChannels(std::string channels);
-  std::string GetAudioChannels();
-  void SetAudioSampleRate(int sampleRate);
-  int GetAudioSampleRate();
-  void SetAudioBitsPerSample(int bitsPerSample);
-  int GetAudioBitsPerSample();
+  void SetAudioDecoderName(std::string name, bool bAudio2 = false);
+  std::string GetAudioDecoderName(bool bAudio2 = false);
+  void SetAudioChannels(std::string channels, bool bAudio2 = false);
+  std::string GetAudioChannels(bool bAudio2 = false);
+  void SetAudioSampleRate(int sampleRate, bool bAudio2 = false);
+  int GetAudioSampleRate(bool bAudio2 = false);
+  void SetAudioBitsPerSample(int bitsPerSample, bool bAudio2 = false);
+  int GetAudioBitsPerSample(bool bAudio2 = false);
   void SetAudioLiveBitRate(int bitRate);
   int GetAudioLiveBitRate();
   void SetAudioQueueLevel(int level);
@@ -245,7 +245,7 @@ protected:
     int queueDataLevel;
   } m_playerVideoInfo;
 
-  CCriticalSection m_audioPlayerSection;
+  CCriticalSection m_audioPlayerSection, m_audio2PlayerSection;
   struct SPlayerAudioInfo
   {
     std::string decoderName;
@@ -255,7 +255,7 @@ protected:
     int liveBitRate;
     int queueLevel;
     int queueDataLevel;
-  } m_playerAudioInfo;
+  } m_playerAudioInfo, m_playerAudio2Info;
 
   CCriticalSection m_subtitlePlayerSection;
   struct SPlayerSubtitleInfo
