@@ -52,7 +52,7 @@ public:
                                                           CProcessInfo& processInfo,
                                                           bool allowpassthrough,
                                                           bool allowdtshddecode,
-                                                          CAEStreamInfo::DataType ptStreamType);
+                                                          CAEStreamInfo::DataType ptStreamType, bool bAudio2 = false);
 
   static std::unique_ptr<CDVDOverlayCodec> CreateOverlayCodec(CDVDStreamInfo& hint);
 

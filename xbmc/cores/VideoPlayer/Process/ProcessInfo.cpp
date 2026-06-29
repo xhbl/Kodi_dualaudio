@@ -381,30 +381,59 @@ void CProcessInfo::SetPixFormats(std::vector<AVPixelFormat> &formats)
 //******************************************************************************
 void CProcessInfo::ResetAudioCodecInfo()
 {
-  std::unique_lock lock(m_audioCodecSection);
-
-  m_audioDecoderName = "unknown";
-  m_audioChannels = "unknown";
-  m_audioSampleRate = 0;;
-  m_audioBitsPerSample = 0;
-  m_audioLiveBitRate = 0;
-  m_audioQueueLevel = 0;
-  m_audioQueueDataLevel = 0;
-
-  if (m_dataCache)
   {
-    m_dataCache->SetAudioDecoderName(m_audioDecoderName);
-    m_dataCache->SetAudioChannels(m_audioChannels);
-    m_dataCache->SetAudioSampleRate(m_audioSampleRate);
-    m_dataCache->SetAudioBitsPerSample(m_audioBitsPerSample);
-    m_dataCache->SetAudioLiveBitRate(m_audioLiveBitRate);
-    m_dataCache->SetAudioQueueLevel(m_audioQueueLevel);
-    m_dataCache->SetAudioQueueDataLevel(m_audioQueueDataLevel);
+    std::unique_lock lock(m_audioCodecSection);
+
+    m_audioDecoderName = "unknown";
+    m_audioChannels = "unknown";
+    m_audioSampleRate = 0;
+    m_audioBitsPerSample = 0;
+    m_audioLiveBitRate = 0;
+    m_audioQueueLevel = 0;
+    m_audioQueueDataLevel = 0;
+
+    if (m_dataCache)
+    {
+      m_dataCache->SetAudioDecoderName(m_audioDecoderName);
+      m_dataCache->SetAudioChannels(m_audioChannels);
+      m_dataCache->SetAudioSampleRate(m_audioSampleRate);
+      m_dataCache->SetAudioBitsPerSample(m_audioBitsPerSample);
+      m_dataCache->SetAudioLiveBitRate(m_audioLiveBitRate);
+      m_dataCache->SetAudioQueueLevel(m_audioQueueLevel);
+      m_dataCache->SetAudioQueueDataLevel(m_audioQueueDataLevel);
+    }
+  }
+  {
+    std::unique_lock lock(m_audio2CodecSection);
+
+    m_audio2DecoderName = "unknown";
+    m_audio2Channels = "unknown";
+    m_audio2SampleRate = 0;
+    m_audio2BitsPerSample = 0;
+
+    if (m_dataCache)
+    {
+      m_dataCache->SetAudioDecoderName(m_audio2DecoderName, true);
+      m_dataCache->SetAudioChannels(m_audio2Channels, true);
+      m_dataCache->SetAudioSampleRate(m_audio2SampleRate, true);
+      m_dataCache->SetAudioBitsPerSample(m_audio2BitsPerSample, true);
+    }
   }
 }
 
-void CProcessInfo::SetAudioDecoderName(const std::string &name)
+void CProcessInfo::SetAudioDecoderName(const std::string &name, bool bAudio2)
 {
+  if (bAudio2)
+  {
+    std::unique_lock lock(m_audio2CodecSection);
+
+    m_audio2DecoderName = name;
+
+    if (m_dataCache)
+      m_dataCache->SetAudioDecoderName(m_audio2DecoderName, true);
+    return;
+  }
+
   std::unique_lock lock(m_audioCodecSection);
 
   m_audioDecoderName = name;
@@ -413,15 +442,33 @@ void CProcessInfo::SetAudioDecoderName(const std::string &name)
     m_dataCache->SetAudioDecoderName(m_audioDecoderName);
 }
 
-std::string CProcessInfo::GetAudioDecoderName()
+std::string CProcessInfo::GetAudioDecoderName(bool bAudio2)
 {
+  if (bAudio2)
+  {
+    std::unique_lock lock(m_audio2CodecSection);
+
+    return m_audio2DecoderName;
+  }
+
   std::unique_lock lock(m_audioCodecSection);
 
   return m_audioDecoderName;
 }
 
-void CProcessInfo::SetAudioChannels(const std::string &channels)
+void CProcessInfo::SetAudioChannels(const std::string &channels, bool bAudio2)
 {
+  if (bAudio2)
+  {
+    std::unique_lock lock(m_audio2CodecSection);
+
+    m_audio2Channels = channels;
+
+    if (m_dataCache)
+      m_dataCache->SetAudioChannels(m_audio2Channels, true);
+    return;
+  }
+
   std::unique_lock lock(m_audioCodecSection);
 
   m_audioChannels = channels;
@@ -430,15 +477,33 @@ void CProcessInfo::SetAudioChannels(const std::string &channels)
     m_dataCache->SetAudioChannels(m_audioChannels);
 }
 
-std::string CProcessInfo::GetAudioChannels()
+std::string CProcessInfo::GetAudioChannels(bool bAudio2)
 {
+  if (bAudio2)
+  {
+    std::unique_lock lock(m_audio2CodecSection);
+
+    return m_audio2Channels;
+  }
+
   std::unique_lock lock(m_audioCodecSection);
 
   return m_audioChannels;
 }
 
-void CProcessInfo::SetAudioSampleRate(int sampleRate)
+void CProcessInfo::SetAudioSampleRate(int sampleRate, bool bAudio2)
 {
+  if (bAudio2)
+  {
+    std::unique_lock lock(m_audio2CodecSection);
+
+    m_audio2SampleRate = sampleRate;
+
+    if (m_dataCache)
+      m_dataCache->SetAudioSampleRate(m_audio2SampleRate, true);
+    return;
+  }
+
   std::unique_lock lock(m_audioCodecSection);
 
   m_audioSampleRate = sampleRate;
@@ -447,15 +512,33 @@ void CProcessInfo::SetAudioSampleRate(int sampleRate)
     m_dataCache->SetAudioSampleRate(m_audioSampleRate);
 }
 
-int CProcessInfo::GetAudioSampleRate()
+int CProcessInfo::GetAudioSampleRate(bool bAudio2)
 {
+  if (bAudio2)
+  {
+    std::unique_lock lock(m_audio2CodecSection);
+
+    return m_audio2SampleRate;
+  }
+
   std::unique_lock lock(m_audioCodecSection);
 
   return m_audioSampleRate;
 }
 
-void CProcessInfo::SetAudioBitsPerSample(int bitsPerSample)
+void CProcessInfo::SetAudioBitsPerSample(int bitsPerSample, bool bAudio2)
 {
+  if (bAudio2)
+  {
+    std::unique_lock lock(m_audio2CodecSection);
+
+    m_audio2BitsPerSample = bitsPerSample;
+
+    if (m_dataCache)
+      m_dataCache->SetAudioBitsPerSample(m_audio2BitsPerSample, true);
+    return;
+  }
+
   std::unique_lock lock(m_audioCodecSection);
 
   m_audioBitsPerSample = bitsPerSample;
@@ -464,8 +547,15 @@ void CProcessInfo::SetAudioBitsPerSample(int bitsPerSample)
     m_dataCache->SetAudioBitsPerSample(m_audioBitsPerSample);
 }
 
-int CProcessInfo::GetAudioBitsPerSample()
+int CProcessInfo::GetAudioBitsPerSample(bool bAudio2)
 {
+  if (bAudio2)
+  {
+    std::unique_lock lock(m_audio2CodecSection);
+
+    return m_audio2BitsPerSample;
+  }
+
   std::unique_lock lock(m_audioCodecSection);
 
   return m_audioBitsPerSample;

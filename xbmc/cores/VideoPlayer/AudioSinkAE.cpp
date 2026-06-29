@@ -26,7 +26,7 @@ extern "C"
 
 using namespace std::chrono_literals;
 
-CAudioSinkAE::CAudioSinkAE(CDVDClock *clock) : m_pClock(clock)
+CAudioSinkAE::CAudioSinkAE(CDVDClock *clock, bool bAudio2) : m_pClock(clock)
 {
   m_bPassthrough = false;
   m_iBitsPerSample = 0;
@@ -36,6 +36,7 @@ CAudioSinkAE::CAudioSinkAE(CDVDClock *clock) : m_pClock(clock)
   m_timeOfPts = 0.0; //silence coverity uninitialized warning, is set elsewhere
   m_syncError = 0.0;
   m_syncErrorTime = 0;
+  m_bAudio2 = bAudio2;
 }
 
 CAudioSinkAE::~CAudioSinkAE()
@@ -56,7 +57,7 @@ bool CAudioSinkAE::Create(const DVDAudioFrame &audioframe, AVCodecID codec, bool
   options |= AESTREAM_PAUSED;
 
   AEAudioFormat format = audioframe.format;
-  m_pAudioStream = CServiceBroker::GetActiveAE()->MakeStream(
+  m_pAudioStream = CServiceBroker::GetActiveAE(m_bAudio2)->MakeStream(
     format,
     options,
     this
@@ -381,14 +382,14 @@ CAEStreamInfo::DataType CAudioSinkAE::GetPassthroughStreamType(AVCodecID codecId
       format.m_streamInfo.m_type = CAEStreamInfo::STREAM_TYPE_NULL;
   }
 
-  bool supports = CServiceBroker::GetActiveAE()->SupportsRaw(format);
+  bool supports = CServiceBroker::GetActiveAE(m_bAudio2)->SupportsRaw(format);
 
   if (!supports && codecId == AV_CODEC_ID_DTS &&
       format.m_streamInfo.m_type != CAEStreamInfo::STREAM_TYPE_DTSHD_CORE &&
-      CServiceBroker::GetActiveAE()->UsesDtsCoreFallback())
+      CServiceBroker::GetActiveAE(m_bAudio2)->UsesDtsCoreFallback())
   {
     format.m_streamInfo.m_type = CAEStreamInfo::STREAM_TYPE_DTSHD_CORE;
-    supports = CServiceBroker::GetActiveAE()->SupportsRaw(format);
+    supports = CServiceBroker::GetActiveAE(m_bAudio2)->SupportsRaw(format);
   }
 
   if (supports)

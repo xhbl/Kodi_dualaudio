@@ -29,7 +29,7 @@ class CDVDClock;
 class CAudioSinkAE : IAEClockCallback
 {
 public:
-  explicit CAudioSinkAE(CDVDClock *clock);
+  explicit CAudioSinkAE(CDVDClock *clock, bool bAudio2=false);
   ~CAudioSinkAE() override;
 
   void SetVolume(float fVolume);
@@ -82,4 +82,6 @@ protected:
 
   std::atomic_bool m_bAbort;
   CDVDClock *m_pClock;
+
+  bool m_bAudio2;
 };
