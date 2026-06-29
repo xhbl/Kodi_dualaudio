@@ -62,16 +62,16 @@ public:
 
   // player audio info
   void ResetAudioCodecInfo();
-  void SetAudioDecoderName(const std::string &name);
-  std::string GetAudioDecoderName();
-  void SetAudioChannels(const std::string &channels);
-  std::string GetAudioChannels();
-  void SetAudioSampleRate(int sampleRate);
-  int GetAudioSampleRate();
-  void SetAudioBitsPerSample(int bitsPerSample);
-  int GetAudioBitsPerSample();
+  void SetAudioDecoderName(const std::string &name, bool bAudio2 = false);
+  std::string GetAudioDecoderName(bool bAudio2 = false);
+  void SetAudioChannels(const std::string &channels, bool bAudio2 = false);
+  std::string GetAudioChannels(bool bAudio2 = false);
+  void SetAudioSampleRate(int sampleRate, bool bAudio2 = false);
+  int GetAudioSampleRate(bool bAudio2 = false);
+  void SetAudioBitsPerSample(int bitsPerSample, bool bAudio2 = false);
+  int GetAudioBitsPerSample(bool bAudio2 = false);
   virtual bool AllowDTSHDDecode();
-  virtual bool WantsRawPassthrough() { return false; }
+  virtual bool WantsRawPassthrough(bool bAudio2 = false) { return false; }
 
   // render info
   void SetRenderClockSync(bool enabled);
@@ -147,6 +147,12 @@ protected:
   int m_audioSampleRate;
   int m_audioBitsPerSample;
   CCriticalSection m_audioCodecSection;
+
+  std::string m_audio2DecoderName;
+  std::string m_audio2Channels;
+  int m_audio2SampleRate;
+  int m_audio2BitsPerSample;
+  CCriticalSection m_audio2CodecSection;
 
   // render info
   CCriticalSection m_renderSection;

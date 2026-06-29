@@ -29,10 +29,10 @@ EINTERLACEMETHOD CProcessInfoAndroid::GetFallbackDeintMethod()
   return EINTERLACEMETHOD::VS_INTERLACEMETHOD_DEINTERLACE_HALF;
 }
 
-bool CProcessInfoAndroid::WantsRawPassthrough()
+bool CProcessInfoAndroid::WantsRawPassthrough(bool bAudio2)
 {
   const std::string device = CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(
-      CSettings::SETTING_AUDIOOUTPUT_PASSTHROUGHDEVICE);
+      bAudio2 ? CSettings::SETTING_AUDIOOUTPUT2_PASSTHROUGHDEVICE : CSettings::SETTING_AUDIOOUTPUT_PASSTHROUGHDEVICE);
 
   if (std::string::npos != device.find("(RAW)"))
     return true;

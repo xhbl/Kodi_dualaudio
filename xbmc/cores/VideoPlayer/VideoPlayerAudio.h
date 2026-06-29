@@ -50,7 +50,7 @@ public:
   }
   void FlushMessages() override { m_messageQueue.Flush(); }
 
-  void SetDynamicRangeCompression(long drc) override { m_audioSink.SetDynamicRangeCompression(drc); }
+  void SetDynamicRangeCompression(long drc) override { m_audioSink.SetDynamicRangeCompression(drc); if(m_bAudio2) m_audioSink2.SetDynamicRangeCompression(drc); }
   float GetDynamicRangeAmplification() const override { return 0.0f; }
 
   std::string GetPlayerInfo() override;
@@ -71,9 +71,10 @@ protected:
   void OnExit() override;
   void Process() override;
 
-  bool ProcessDecoderOutput(DVDAudioFrame &audioframe);
+  bool ProcessDecoderOutput(DVDAudioFrame &audioframe, DVDAudioFrame &audioframe2);
+  bool ProcessDecoderOutput2(DVDAudioFrame &audioframe2);
   void UpdatePlayerInfo();
-  void OpenStream(CDVDStreamInfo& hints, std::unique_ptr<CDVDAudioCodec> codec);
+  void OpenStream(CDVDStreamInfo& hints, std::unique_ptr<CDVDAudioCodec> codec, std::unique_ptr<CDVDAudioCodec> codec2);
   //! Switch codec if needed. Called when the sample rate gotten from the
   //! codec changes, in which case we may want to switch passthrough on/off.
   bool SwitchCodecIfNeeded();
@@ -88,8 +89,10 @@ protected:
   double m_audioClock;
 
   CAudioSinkAE m_audioSink; // audio output device
+  CAudioSinkAE m_audioSink2; // audio output device 2
   CDVDClock* m_pClock; // dvd master clock
   std::unique_ptr<CDVDAudioCodec> m_pAudioCodec; // audio codec
+  std::unique_ptr<CDVDAudioCodec> m_pAudioCodec2; // audio codec 2
   BitstreamStats m_audioStats;
 
   int m_speed;
@@ -117,5 +120,8 @@ protected:
   bool m_displayReset = false;
   unsigned int m_disconAdjustTimeMs = 50; // maximum sync-off before adjusting
   int m_disconAdjustCounter = 0;
+
+  bool   m_bAudio2;
+  double m_audiodiff;
 };
 

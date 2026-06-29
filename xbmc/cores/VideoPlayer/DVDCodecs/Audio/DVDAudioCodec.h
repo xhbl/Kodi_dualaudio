@@ -49,7 +49,7 @@ class CDVDAudioCodec
 {
 public:
 
-  explicit CDVDAudioCodec(CProcessInfo &processInfo) : m_processInfo(processInfo) {}
+  explicit CDVDAudioCodec(CProcessInfo &processInfo) : m_processInfo(processInfo) { m_bAudio2 = false; }
   virtual ~CDVDAudioCodec() = default;
 
   /*
@@ -117,7 +117,10 @@ public:
    * should return the ffmpeg profile value
    */
   virtual int GetProfile() { return 0; }
-
+  
+  void SetAudio2(bool bAudio2){ m_bAudio2 = bAudio2; };
+  
 protected:
   CProcessInfo &m_processInfo;
+  bool m_bAudio2;
 };
