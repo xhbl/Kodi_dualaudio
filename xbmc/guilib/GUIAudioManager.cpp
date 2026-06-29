@@ -33,8 +33,10 @@ CGUIAudioManager::CGUIAudioManager()
   : m_settings(CServiceBroker::GetSettingsComponent()->GetSettings())
 {
   m_bEnabled = false;
+  m_bAudio2 = false;
 
   m_settings->RegisterCallback(this, {CSettings::SETTING_LOOKANDFEEL_SOUNDSKIN,
+                                      CSettings::SETTING_AUDIOOUTPUT2_GUISOUNDVOLUME,
                                       CSettings::SETTING_AUDIOOUTPUT_GUISOUNDVOLUME});
 }
 
@@ -76,6 +78,11 @@ bool CGUIAudioManager::OnSettingUpdate(const std::shared_ptr<CSetting>& setting,
     int vol = m_settings->GetInt(CSettings::SETTING_AUDIOOUTPUT_GUISOUNDVOLUME);
     SetVolume(0.01f * vol);
   }
+  if (setting->GetId() == CSettings::SETTING_AUDIOOUTPUT2_GUISOUNDVOLUME)
+  {
+    int vol = m_settings->GetInt(CSettings::SETTING_AUDIOOUTPUT2_GUISOUNDVOLUME);
+    SetVolume(0.01f * vol, true);
+  }
   return true;
 }
 
@@ -99,11 +106,17 @@ void CGUIAudioManager::Stop()
       windowSound.second.initSound->Stop();
     if (windowSound.second.deInitSound)
       windowSound.second.deInitSound->Stop();
+    if (windowSound.second.initSound2)
+      windowSound.second.initSound2->Stop();
+    if (windowSound.second.deInitSound2)
+      windowSound.second.deInitSound2->Stop();
   }
 
   for (const auto& pythonSound : m_pythonSounds)
   {
-    pythonSound.second->Stop();
+    pythonSound.second.sound->Stop();
+    if (pythonSound.second.sound2)
+      pythonSound.second.sound2->Stop();
   }
 }
 
@@ -120,11 +133,19 @@ void CGUIAudioManager::PlayActionSound(const CAction& action)
   if (it == m_actionSoundMap.end())
     return;
 
-  if (it->second)
+  CheckAudio2();
+
+  if (it->second.sound)
   {
     int vol = m_settings->GetInt(CSettings::SETTING_AUDIOOUTPUT_GUISOUNDVOLUME);
-    it->second->SetVolume(0.01f * vol);
-    it->second->Play();
+    it->second.sound->SetVolume(0.01f * vol);
+    it->second.sound->Play();
+  }
+  if (m_bAudio2 && it->second.sound2)
+  {
+    int vol = m_settings->GetInt(CSettings::SETTING_AUDIOOUTPUT2_GUISOUNDVOLUME);
+    it->second.sound2->SetVolume(0.01f * vol);
+    it->second.sound2->Play();
   }
 }
 
@@ -142,14 +163,19 @@ void CGUIAudioManager::PlayWindowSound(int id, WINDOW_SOUND event)
   if (it==m_windowSoundMap.end())
     return;
 
+  CheckAudio2();
+
   std::shared_ptr<IAESound> sound;
+  std::shared_ptr<IAESound> sound2;
   switch (event)
   {
     case SOUND_INIT:
       sound = it->second.initSound;
+      sound2 = it->second.initSound2;
       break;
     case SOUND_DEINIT:
       sound = it->second.deInitSound;
+      sound2 = it->second.deInitSound2;
       break;
   }
 
@@ -159,6 +185,13 @@ void CGUIAudioManager::PlayWindowSound(int id, WINDOW_SOUND event)
   int vol = m_settings->GetInt(CSettings::SETTING_AUDIOOUTPUT_GUISOUNDVOLUME);
   sound->SetVolume(0.01f * vol);
   sound->Play();
+
+  if (m_bAudio2 && sound2)
+  {
+    int vol = m_settings->GetInt(CSettings::SETTING_AUDIOOUTPUT2_GUISOUNDVOLUME);
+    sound2->SetVolume(0.01f * vol);
+    sound2->Play();
+  }
 }
 
 // \brief Play a sound given by filename
@@ -170,14 +203,18 @@ void CGUIAudioManager::PlayPythonSound(const std::string& strFileName, bool useC
   if (!m_bEnabled)
     return;
 
+  CheckAudio2();
+
   // If we already loaded the sound, just play it
   const auto itsb = m_pythonSounds.find(strFileName);
   if (itsb != m_pythonSounds.end())
   {
-    const auto& sound = itsb->second;
+    const auto& sound = itsb->second.sound;
     if (useCached)
     {
       sound->Play();
+      const auto& sound2 = itsb->second.sound2;
+      if (m_bAudio2 && sound2) sound2->Play();
       return;
     }
     else
@@ -186,14 +223,22 @@ void CGUIAudioManager::PlayPythonSound(const std::string& strFileName, bool useC
     }
   }
 
-  auto sound = LoadSound(strFileName);
-  if (!sound)
+  CAPSounds aps = LoadSound(strFileName);
+  if (!aps.sound)
     return;
 
   int vol = m_settings->GetInt(CSettings::SETTING_AUDIOOUTPUT_GUISOUNDVOLUME);
-  sound->SetVolume(0.01f * vol);
-  sound->Play();
-  m_pythonSounds.emplace(strFileName, std::move(sound));
+  aps.sound->SetVolume(0.01f * vol);
+  aps.sound->Play();
+
+  if (m_bAudio2 && aps.sound2)
+  {
+    int vol = m_settings->GetInt(CSettings::SETTING_AUDIOOUTPUT2_GUISOUNDVOLUME);
+    aps.sound2->SetVolume(0.01f * vol);
+    aps.sound2->Play();
+  }
+
+  m_pythonSounds.emplace(strFileName, std::move(aps));
 }
 
 void CGUIAudioManager::UnLoad()
@@ -228,6 +273,7 @@ bool CGUIAudioManager::Load()
 {
   std::unique_lock<CCriticalSection> lock(m_cs);
   UnLoad();
+  CheckAudio2();
 
   m_strMediaDir = GetSoundSkinPath();
   if (m_strMediaDir.empty())
@@ -279,9 +325,9 @@ bool CGUIAudioManager::Load()
       if (id != ACTION_NONE && !strFile.empty())
       {
         std::string filename = URIUtils::AddFileToFolder(m_strMediaDir, strFile);
-        auto sound = LoadSound(filename);
-        if (sound)
-          m_actionSoundMap.emplace(id, std::move(sound));
+        CAPSounds aps = LoadSound(filename);
+        if (aps.sound)
+          m_actionSoundMap.emplace(id, std::move(aps));
       }
 
       pAction = pAction->NextSibling();
@@ -306,8 +352,13 @@ bool CGUIAudioManager::Load()
       }
 
       CWindowSounds sounds;
-      sounds.initSound   = LoadWindowSound(pWindow, "activate"  );
-      sounds.deInitSound = LoadWindowSound(pWindow, "deactivate");
+      CAPSounds aps;
+      aps = LoadWindowSound(pWindow, "activate");
+      sounds.initSound = aps.sound;
+      sounds.initSound2 = aps.sound2;
+      aps = LoadWindowSound(pWindow, "deactivate");
+      sounds.deInitSound = aps.sound;
+      sounds.deInitSound2 = aps.sound2;
 
       if (id > 0)
         m_windowSoundMap.insert(std::pair<int, CWindowSounds>(id, sounds));
@@ -319,44 +370,58 @@ bool CGUIAudioManager::Load()
   return true;
 }
 
-std::shared_ptr<IAESound> CGUIAudioManager::LoadSound(const std::string& filename)
+CGUIAudioManager::CAPSounds CGUIAudioManager::LoadSound(const std::string& filename)
 {
   std::unique_lock<CCriticalSection> lock(m_cs);
+  CAPSounds aps;
+  aps.sound = aps.sound2 = nullptr;
   const auto it = m_soundCache.find(filename);
   if (it != m_soundCache.end())
   {
-    auto sound = it->second.lock();
-    if (sound)
-      return sound;
+    aps.sound = it->second.sound.lock();
+    aps.sound2 = it->second.sound2.lock();
+    if (aps.sound)
+      return aps;
     else
       m_soundCache.erase(it); // cleanup orphaned cache entry
   }
 
   IAE *ae = CServiceBroker::GetActiveAE();
   if (!ae)
-    return nullptr;
+    return aps;
 
   std::shared_ptr<IAESound> sound(ae->MakeSound(filename));
   if (!sound)
-    return nullptr;
+    return aps;
 
-  m_soundCache[filename] = sound;
+  IAE *ae2 = CServiceBroker::GetActiveAE(true);
+  std::shared_ptr<IAESound> sound2(ae2 ? ae2->MakeSound(filename) : nullptr);
 
-  return sound;
+  CSoundInfo info;
+  info.sound = sound;
+  info.sound2 = sound2;
+  m_soundCache[filename] = info;
+
+  aps.sound = sound;
+  aps.sound2 = sound2;
+  return aps;
 }
 
 // \brief Load a window node of the config file (sounds.xml)
-std::shared_ptr<IAESound> CGUIAudioManager::LoadWindowSound(TiXmlNode* pWindowNode,
+CGUIAudioManager::CAPSounds CGUIAudioManager::LoadWindowSound(TiXmlNode* pWindowNode,
                                                             const std::string& strIdentifier)
 {
+  CAPSounds aps;
+  aps.sound = aps.sound2 = NULL;
+
   if (!pWindowNode)
-    return NULL;
+    return aps;
 
   TiXmlNode* pFileNode = pWindowNode->FirstChild(strIdentifier);
   if (pFileNode && pFileNode->FirstChild())
     return LoadSound(URIUtils::AddFileToFolder(m_strMediaDir, pFileNode->FirstChild()->Value()));
 
-  return NULL;
+  return aps;
 }
 
 // \brief Enable/Disable nav sounds
@@ -371,31 +436,44 @@ void CGUIAudioManager::Enable(bool bEnable)
 }
 
 // \brief Sets the volume of all playing sounds
-void CGUIAudioManager::SetVolume(float level)
+void CGUIAudioManager::SetVolume(float level, bool bAudio2)
 {
   std::unique_lock<CCriticalSection> lock(m_cs);
 
   {
     for (const auto& actionSound : m_actionSoundMap)
     {
-      if (actionSound.second)
-        actionSound.second->SetVolume(level);
+      if (!bAudio2 && actionSound.second.sound)
+        actionSound.second.sound->SetVolume(level);
+      if (bAudio2 && actionSound.second.sound2)
+        actionSound.second.sound2->SetVolume(level);
     }
   }
 
   for (const auto& windowSound : m_windowSoundMap)
   {
-    if (windowSound.second.initSound)
+    if (!bAudio2 && windowSound.second.initSound)
       windowSound.second.initSound->SetVolume(level);
-    if (windowSound.second.deInitSound)
+    if (!bAudio2 && windowSound.second.deInitSound)
       windowSound.second.deInitSound->SetVolume(level);
+    if (bAudio2 && windowSound.second.initSound2)
+      windowSound.second.initSound2->SetVolume(level);
+    if (bAudio2 && windowSound.second.deInitSound2)
+      windowSound.second.deInitSound2->SetVolume(level);
   }
 
   {
     for (const auto& pythonSound : m_pythonSounds)
     {
-      if (pythonSound.second)
-        pythonSound.second->SetVolume(level);
+      if (!bAudio2 && pythonSound.second.sound)
+        pythonSound.second.sound->SetVolume(level);
+      if (bAudio2 && pythonSound.second.sound2)
+        pythonSound.second.sound2->SetVolume(level);
     }
   }
+}
+
+void CGUIAudioManager::CheckAudio2()
+{
+  m_bAudio2 = CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_AUDIOOUTPUT2_ENABLED);
 }

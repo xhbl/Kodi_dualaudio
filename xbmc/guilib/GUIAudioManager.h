@@ -32,6 +32,22 @@ class CGUIAudioManager : public ISettingCallback
   public:
     std::shared_ptr<IAESound> initSound;
     std::shared_ptr<IAESound> deInitSound;
+    std::shared_ptr<IAESound> initSound2;
+    std::shared_ptr<IAESound> deInitSound2;
+  };
+
+  class CAPSounds
+  {
+  public:
+    std::shared_ptr<IAESound> sound;
+    std::shared_ptr<IAESound> sound2;
+  };
+
+  class CSoundInfo
+  {
+  public:
+    std::weak_ptr<IAESound> sound;
+    std::weak_ptr<IAESound> sound2;
   };
 
   struct IAESoundDeleter
@@ -59,18 +75,19 @@ public:
   void PlayWindowSound(int id, WINDOW_SOUND event);
   void PlayPythonSound(const std::string& strFileName, bool useCached = true);
 
+  void CheckAudio2();
   void Enable(bool bEnable);
-  void SetVolume(float level);
+  void SetVolume(float level, bool bAudio2 = false);
   void Stop();
 
 private:
   // Construction parameters
   std::shared_ptr<CSettings> m_settings;
 
-  typedef std::map<const std::string, std::weak_ptr<IAESound>> soundCache;
-  typedef std::map<int, std::shared_ptr<IAESound>> actionSoundMap;
+  typedef std::map<const std::string, CSoundInfo> soundCache;
+  typedef std::map<int, CAPSounds> actionSoundMap;
   typedef std::map<int, CWindowSounds> windowSoundMap;
-  typedef std::map<const std::string, std::shared_ptr<IAESound>> pythonSoundsMap;
+  typedef std::map<const std::string, CAPSounds> pythonSoundsMap;
 
   soundCache          m_soundCache;
   actionSoundMap      m_actionSoundMap;
@@ -79,11 +96,12 @@ private:
 
   std::string          m_strMediaDir;
   bool                m_bEnabled;
+  bool                m_bAudio2;
 
   CCriticalSection    m_cs;
 
-  std::shared_ptr<IAESound> LoadSound(const std::string& filename);
-  std::shared_ptr<IAESound> LoadWindowSound(TiXmlNode* pWindowNode,
-                                            const std::string& strIdentifier);
+  CAPSounds LoadSound(const std::string& filename);
+  CAPSounds LoadWindowSound(TiXmlNode* pWindowNode,
+                            const std::string& strIdentifier);
 };
 
