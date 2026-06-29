@@ -207,6 +207,7 @@ protected:
   std::unique_ptr<CGUIComponent> m_pGUI;
   std::unique_ptr<CWinSystemBase> m_pWinSystem;
   std::unique_ptr<ActiveAE::CActiveAE> m_pActiveAE;
+  std::unique_ptr<ActiveAE::CActiveAE> m_pActiveAE2;
   std::shared_ptr<CAppInboundProtocol> m_pAppPort;
   std::deque<XBMC_Event> m_portEvents;
   CCriticalSection m_portSection;

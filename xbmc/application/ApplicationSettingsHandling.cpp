@@ -47,6 +47,7 @@ void CApplicationSettingsHandling::RegisterSettings()
   settingsMgr->RegisterSettingsHandler(this);
 
   settingsMgr->RegisterCallback(this, {CSettings::SETTING_AUDIOOUTPUT_PASSTHROUGH,
+                                       CSettings::SETTING_AUDIOOUTPUT2_PASSTHROUGH,
                                        CSettings::SETTING_LOOKANDFEEL_SKIN,
                                        CSettings::SETTING_LOOKANDFEEL_SKINSETTINGS,
                                        CSettings::SETTING_LOOKANDFEEL_FONT,
@@ -129,7 +130,7 @@ void CApplicationSettingsHandling::OnSettingChanged(const std::shared_ptr<const 
       CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(
           CServiceBroker::GetWinSystem()->GetGfxContext().GetVideoResolution(), true);
   }
-  else if (settingId == CSettings::SETTING_AUDIOOUTPUT_PASSTHROUGH)
+  else if (settingId == CSettings::SETTING_AUDIOOUTPUT_PASSTHROUGH || settingId == CSettings::SETTING_AUDIOOUTPUT2_PASSTHROUGH)
   {
     CServiceBroker::GetAppMessenger()->PostMsg(TMSG_MEDIA_RESTART);
   }
@@ -181,7 +182,7 @@ bool CApplicationSettingsHandling::OnSettingUpdate(const std::shared_ptr<CSettin
     return false;
 
 #if defined(TARGET_DARWIN_OSX)
-  if (setting->GetId() == CSettings::SETTING_AUDIOOUTPUT_AUDIODEVICE)
+  if (setting->GetId() == CSettings::SETTING_AUDIOOUTPUT_AUDIODEVICE || setting->GetId() == CSettings::SETTING_AUDIOOUTPUT2_AUDIODEVICE)
   {
     std::shared_ptr<CSettingString> audioDevice = std::static_pointer_cast<CSettingString>(setting);
     // Gotham and older didn't enumerate audio devices per stream on osx

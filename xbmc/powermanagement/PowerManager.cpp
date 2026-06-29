@@ -204,6 +204,7 @@ void CPowerManager::OnSleep()
   appPower->StopScreenSaverTimer();
   g_application.CloseNetworkShares();
   CServiceBroker::GetActiveAE()->Suspend();
+  if(CServiceBroker::GetActiveAE(true)) CServiceBroker::GetActiveAE(true)->Suspend();
 }
 
 void CPowerManager::OnWake()
@@ -235,6 +236,7 @@ void CPowerManager::OnWake()
 #endif
 
   CServiceBroker::GetActiveAE()->Resume();
+  if(CServiceBroker::GetActiveAE(true)) CServiceBroker::GetActiveAE(true)->Resume();
   g_application.UpdateLibraries();
   CServiceBroker::GetWeatherManager().Refresh();
   CServiceBroker::GetPVRManager().OnWake();

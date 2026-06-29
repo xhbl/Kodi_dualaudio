@@ -505,6 +505,9 @@ namespace XBMCAddon
       IAE *ae = CServiceBroker::GetActiveAE();
       if (ae)
         ae->Suspend();
+      IAE *ae2 = CServiceBroker::GetActiveAE(true);
+      if (ae2)
+        ae2->Suspend();
     }
 
     void audioResume()
@@ -512,6 +515,9 @@ namespace XBMCAddon
       IAE *ae = CServiceBroker::GetActiveAE();
       if (ae)
         ae->Resume();
+      IAE *ae2 = CServiceBroker::GetActiveAE(true);
+      if (ae2)
+        ae2->Resume();
     }
 
     String convertLanguage(const char* language, int format)

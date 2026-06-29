@@ -1357,6 +1357,9 @@ void CXBMCApp::onReceive(CJNIIntent intent)
       IAE *iae = CServiceBroker::GetActiveAE();
       if (iae)
         iae->DeviceChange();
+      IAE *iae2 = CServiceBroker::GetActiveAE(true);
+      if (iae2)
+        iae2->DeviceChange();
     }
   }
   else if (action == CJNIAudioManager::ACTION_HDMI_AUDIO_PLUG)
@@ -1373,6 +1376,7 @@ void CXBMCApp::onReceive(CJNIIntent intent)
     {
       android_printf("CXBMCApp::onReceive: Reset audio engine");
       CServiceBroker::GetActiveAE()->DeviceChange();
+	  if (CServiceBroker::GetActiveAE(true)) CServiceBroker::GetActiveAE(true)->DeviceChange();
       m_aeReset = false;
     }
     if (m_hdmiPlugged && m_wakeUp)
