@@ -273,6 +273,10 @@ void CApplicationMessageHandling::OnApplicationMessage(MESSAGING::ThreadMessage*
       audioengine = CServiceBroker::GetActiveAE();
       if (audioengine && !audioengine->Suspend())
         CLog::LogF(LOGINFO, "Failed to suspend AudioEngine before launching external program");
+      IAE* audioengine2;
+      audioengine2 = CServiceBroker::GetActiveAE(true);
+      if (audioengine2 && !audioengine2->Suspend())
+        CLog::LogF(LOGINFO, "Failed to suspend AudioEngine2 before launching external program");
 
 #if defined(TARGET_DARWIN)
       CLog::Log(LOGINFO, "ExecWait is not implemented on this platform");
@@ -284,6 +288,8 @@ void CApplicationMessageHandling::OnApplicationMessage(MESSAGING::ThreadMessage*
       // Resume AE processing of XBMC native audio
       if (audioengine && !audioengine->Resume())
         CLog::LogF(LOGFATAL, "Failed to restart AudioEngine after return from external player");
+      if (audioengine2 && !audioengine2->Resume())
+        CLog::LogF(LOGFATAL, "Failed to restart AudioEngine2 after return from external player");
 
       break;
 

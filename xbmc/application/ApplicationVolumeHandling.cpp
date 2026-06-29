@@ -46,6 +46,9 @@ void CApplicationVolumeHandling::SetHardwareVolume(float hardwareVolume)
   IAE* ae = CServiceBroker::GetActiveAE();
   if (ae)
     ae->SetVolume(m_volumeLevel);
+  IAE* ae2 = CServiceBroker::GetActiveAE(true);
+  if (ae2)
+    ae2->SetVolume(m_volumeLevel);
 }
 
 void CApplicationVolumeHandling::VolumeChanged()
@@ -113,6 +116,9 @@ void CApplicationVolumeHandling::Mute()
   IAE* ae = CServiceBroker::GetActiveAE();
   if (ae)
     ae->SetMute(true);
+  IAE* ae2 = CServiceBroker::GetActiveAE(true);
+  if (ae2)
+    ae2->SetMute(true);
   m_muted = true;
   VolumeChanged();
 }
@@ -125,6 +131,9 @@ void CApplicationVolumeHandling::UnMute()
   IAE* ae = CServiceBroker::GetActiveAE();
   if (ae)
     ae->SetMute(false);
+  IAE* ae2 = CServiceBroker::GetActiveAE(true);
+  if (ae2)
+    ae2->SetMute(false);
   m_muted = false;
   VolumeChanged();
 }
