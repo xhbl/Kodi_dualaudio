@@ -29,6 +29,9 @@ public:
     m_bitRate = 0;
     m_bitsPerSample = 0;
     m_bitsPerCodedSample = 0;
+    m_bAudio2 = false;
+    m_bCheckAudio2 = false;
+    m_bReusableForAudio2 = true;
   };
   virtual ~ICodec() = default;
 
@@ -78,5 +81,15 @@ public:
   MUSIC_INFO::CMusicInfoTag m_tag;
   XFILE::CFile m_file;
   AEAudioFormat m_format;
+
+  void SetAudio2(bool bAudio2){ m_bAudio2 = bAudio2; }
+  bool IsAudio2() { return m_bAudio2; }
+  void SetCheckAudio2(bool bCheckAudio2){ m_bCheckAudio2 = m_bAudio2 ? false : bCheckAudio2; }
+  bool IsReusableForAudio2(){ return m_bReusableForAudio2; }
+
+protected:
+  bool m_bAudio2;
+  bool m_bCheckAudio2;
+  bool m_bReusableForAudio2;
 };
 

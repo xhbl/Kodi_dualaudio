@@ -39,7 +39,7 @@ public:
   void SetPassthroughStreamType(CAEStreamInfo::DataType streamType);
 
 private:
-  CAEStreamInfo::DataType GetPassthroughStreamType(AVCodecID codecId, int samplerate, int profile);
+  CAEStreamInfo::DataType GetPassthroughStreamType(AVCodecID codecId, int samplerate, int profile, bool bAudio2=false);
 
   CDVDDemux* m_pDemuxer{nullptr};
   std::shared_ptr<CDVDInputStream> m_pInputStream;

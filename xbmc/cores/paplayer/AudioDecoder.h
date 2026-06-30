@@ -64,6 +64,9 @@ public:
   uint8_t* GetRawData(int &size);
   ICodec *GetCodec() const { return m_codec; }
   float GetReplayGain(float &peakVal);
+  void SetAudio2(bool bAudio2){ m_bAudio2 = bAudio2; }
+  void SetCheckAudio2(bool bCheckAudio2){ m_bCheckAudio2 = m_bAudio2 ? false : bCheckAudio2; }
+  bool IsReusableForAudio2();
 
 private:
   // pcm buffer
@@ -88,4 +91,7 @@ private:
   ICodec* m_codec;
 
   CCriticalSection m_critSection;
+
+  bool    m_bAudio2;
+  bool    m_bCheckAudio2;
 };
