@@ -66,6 +66,8 @@ public:
 private:
   CRPProcessInfo& m_processInfo;
   IAE::StreamPtr m_pAudioStream;
+  IAE::StreamPtr m_pAudioStream2;
+  bool m_bAudio2;
   bool m_bAudioEnabled = true;
 
   uint64_t m_droppedFrames = 0;
