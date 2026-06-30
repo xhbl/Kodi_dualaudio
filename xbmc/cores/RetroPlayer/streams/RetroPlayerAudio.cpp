@@ -15,6 +15,8 @@
 #include "cores/AudioEngine/Utils/AEUtil.h"
 #include "cores/RetroPlayer/audio/AudioTranslator.h"
 #include "cores/RetroPlayer/process/RPProcessInfo.h"
+#include "settings/Settings.h"
+#include "settings/SettingsComponent.h"
 #include "utils/log.h"
 
 #include <cmath>
@@ -25,8 +27,9 @@ using namespace RETRO;
 const double MAX_DELAY = 0.3; // seconds
 
 CRetroPlayerAudio::CRetroPlayerAudio(CRPProcessInfo& processInfo)
-  : m_processInfo(processInfo), m_pAudioStream(nullptr)
+  : m_processInfo(processInfo), m_pAudioStream(nullptr), m_pAudioStream2(nullptr)
 {
+  m_bAudio2 = false;
   CLog::Log(LOGDEBUG, "RetroPlayer[AUDIO]: Initializing audio");
 }
 
@@ -39,6 +42,8 @@ CRetroPlayerAudio::~CRetroPlayerAudio()
 
 bool CRetroPlayerAudio::OpenStream(const StreamProperties& properties)
 {
+  m_bAudio2 = CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_AUDIOOUTPUT2_ENABLED) ? true : false;
+
   const AudioStreamProperties& audioProperties =
       static_cast<const AudioStreamProperties&>(properties);
 
@@ -73,12 +78,13 @@ bool CRetroPlayerAudio::OpenStream(const StreamProperties& properties)
     return false;
   }
 
-  if (m_pAudioStream != nullptr)
+  if (m_pAudioStream != nullptr || m_pAudioStream2 != nullptr)
     CloseStream();
 
   IAE* audioEngine = CServiceBroker::GetActiveAE();
   if (audioEngine == nullptr)
     return false;
+  IAE* audioEngine2 = CServiceBroker::GetActiveAE(true);
 
   CLog::Log(
       LOGINFO,
@@ -95,6 +101,13 @@ bool CRetroPlayerAudio::OpenStream(const StreamProperties& properties)
   {
     CLog::Log(LOGERROR, "RetroPlayer[AUDIO]: Failed to create audio stream");
     return false;
+  }
+
+  if (m_bAudio2 && audioEngine2)
+  {
+    m_pAudioStream2 = audioEngine2->MakeStream(audioFormat);
+    if (m_pAudioStream2 == nullptr)
+      CLog::Log(LOGERROR, "RetroPlayer[AUDIO]: Failed to create 2nd audio stream");
   }
 
   m_processInfo.SetAudioChannels(audioFormat.m_channelLayout);
@@ -128,6 +141,25 @@ void CRetroPlayerAudio::AddStreamData(const StreamPacket& packet)
 
       m_pAudioStream->AddData(&audioPacket.data, 0, frameCount, nullptr);
     }
+    if (m_bAudio2 && m_pAudioStream2)
+    {
+      const double delaySecs = m_pAudioStream2->GetDelay();
+
+      const size_t frameSize = m_pAudioStream2->GetChannelCount() *
+                               (CAEUtil::DataFormatToBits(m_pAudioStream2->GetDataFormat()) >> 3);
+
+      const unsigned int frameCount = static_cast<unsigned int>(audioPacket.size / frameSize);
+
+      if (delaySecs > MAX_DELAY)
+      {
+        m_pAudioStream2->Flush();
+        CLog::Log(LOGDEBUG, "RetroPlayer[AUDIO]: Audio2 delay ({:0.2f} ms) is too high - flushing",
+                  delaySecs * 1000);
+      }
+
+      if(!CServiceBroker::GetActiveAE(true)->IsDisabled())
+        m_pAudioStream2->AddData(&audioPacket.data, 0, frameCount, nullptr);
+    }
   }
 }
 
@@ -138,5 +170,6 @@ void CRetroPlayerAudio::CloseStream()
     CLog::Log(LOGDEBUG, "RetroPlayer[AUDIO]: Closing audio stream");
 
     m_pAudioStream.reset();
+    m_pAudioStream2.reset();
   }
 }
