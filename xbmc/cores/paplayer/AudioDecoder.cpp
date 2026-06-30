@@ -36,6 +36,9 @@ CAudioDecoder::CAudioDecoder()
   m_canPlay = false;
   m_startThresholdBytes = 0;
 
+  m_bAudio2 = false;
+  m_bCheckAudio2 = false;
+
   // output buffer (for transferring data from the Pcm Buffer to the rest of the audio chain)
   memset(&m_outputBuffer, 0, OUTPUT_SAMPLES * sizeof(float));
   memset(&m_pcmInputBuffer, 0, INPUT_SIZE * sizeof(unsigned char));
@@ -84,6 +87,11 @@ bool CAudioDecoder::Create(const CFileItem& file, int64_t seekOffset, int stream
 
   // create our codec
   m_codec=CodecFactory::CreateCodecDemux(file, filecache * 1024);
+  if (m_codec)
+  {
+    m_codec->SetAudio2(m_bAudio2);
+    m_codec->SetCheckAudio2(m_bCheckAudio2);
+  }
 
   if (!m_codec || !m_codec->Init(file, filecache * 1024))
   {
@@ -515,4 +523,9 @@ void CAudioDecoder::GetStreamInfo(int index, AudioStreamInfo& info) const
     m_codec->GetStreamInfo(index, info);
   else
     info.valid = false;
+}
+
+bool CAudioDecoder::IsReusableForAudio2()
+{
+  return m_codec ? m_codec->IsReusableForAudio2() : false;
 }

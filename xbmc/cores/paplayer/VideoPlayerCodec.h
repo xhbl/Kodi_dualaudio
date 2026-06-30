@@ -43,7 +43,7 @@ public:
   void GetStreamInfo(int index, AudioStreamInfo& info) const override;
 
 private:
-  CAEStreamInfo::DataType GetPassthroughStreamType(AVCodecID codecId, int samplerate, int profile);
+  CAEStreamInfo::DataType GetPassthroughStreamType(AVCodecID codecId, int samplerate, int profile, bool bAudio2=false);
 
   std::vector<CDemuxStreamAudio*> GetAudioStreams() const;
   CDemuxStreamAudio* GetAudioStream(int uniqueId) const;

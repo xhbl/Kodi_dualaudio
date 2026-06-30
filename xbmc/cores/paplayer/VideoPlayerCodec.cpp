@@ -146,8 +146,8 @@ bool VideoPlayerCodec::Init(const CFileItem &file, unsigned int filecache)
   CDVDStreamInfo hint(*pStream, true);
 
   CAEStreamInfo::DataType ptStreamTye =
-      GetPassthroughStreamType(hint.codec, hint.samplerate, hint.profile);
-  m_pAudioCodec = CDVDFactoryCodec::CreateAudioCodec(hint, *m_processInfo, true, true, ptStreamTye);
+      GetPassthroughStreamType(hint.codec, hint.samplerate, hint.profile, m_bAudio2);
+  m_pAudioCodec = CDVDFactoryCodec::CreateAudioCodec(hint, *m_processInfo, true, true, ptStreamTye, m_bAudio2);
   if (!m_pAudioCodec)
   {
     CLog::Log(LOGERROR, "{}: Could not create audio codec", __FUNCTION__);
@@ -157,6 +157,11 @@ bool VideoPlayerCodec::Init(const CFileItem &file, unsigned int filecache)
       throw std::runtime_error("m_pInputStream reference count is greater than 1");
     m_pInputStream.reset();
     return false;
+  }
+  if (m_bCheckAudio2)
+  {
+      if (ptStreamTye != GetPassthroughStreamType(hint.codec, hint.samplerate, hint.profile, true))
+        m_bReusableForAudio2 = false;
   }
 
   // Extract ReplayGain info
@@ -613,7 +618,8 @@ bool VideoPlayerCodec::NeedConvert(AEDataFormat fmt)
 
 CAEStreamInfo::DataType VideoPlayerCodec::GetPassthroughStreamType(AVCodecID codecId,
                                                                    int samplerate,
-                                                                   int profile)
+                                                                   int profile,
+                                                                   bool bAudio2)
 {
   AEAudioFormat format;
   format.m_dataFormat = AE_FMT_RAW;
@@ -651,14 +657,14 @@ CAEStreamInfo::DataType VideoPlayerCodec::GetPassthroughStreamType(AVCodecID cod
       format.m_streamInfo.m_type = CAEStreamInfo::STREAM_TYPE_NULL;
   }
 
-  bool supports = CServiceBroker::GetActiveAE()->SupportsRaw(format);
+  bool supports = CServiceBroker::GetActiveAE(bAudio2)->SupportsRaw(format);
 
   if (!supports && codecId == AV_CODEC_ID_DTS &&
       format.m_streamInfo.m_type != CAEStreamInfo::STREAM_TYPE_DTSHD_CORE &&
-      CServiceBroker::GetActiveAE()->UsesDtsCoreFallback())
+      CServiceBroker::GetActiveAE(bAudio2)->UsesDtsCoreFallback())
   {
     format.m_streamInfo.m_type = CAEStreamInfo::STREAM_TYPE_DTSHD_CORE;
-    supports = CServiceBroker::GetActiveAE()->SupportsRaw(format);
+    supports = CServiceBroker::GetActiveAE(bAudio2)->SupportsRaw(format);
   }
 
   if (supports)
@@ -789,9 +795,10 @@ VideoPlayerCodec::SwitchResult VideoPlayerCodec::SwitchToStream(CDemuxStreamAudi
   {
     CDVDStreamInfo hint(*newStream, true);
     const CAEStreamInfo::DataType ptStreamType =
-        GetPassthroughStreamType(hint.codec, hint.samplerate, hint.profile);
+        GetPassthroughStreamType(hint.codec, hint.samplerate, hint.profile, m_bAudio2);
 
-    codec = CDVDFactoryCodec::CreateAudioCodec(hint, *m_processInfo, true, true, ptStreamType);
+    codec = CDVDFactoryCodec::CreateAudioCodec(hint, *m_processInfo, true, true, ptStreamType,
+                                               m_bAudio2);
   }
 
   if (!codec)
