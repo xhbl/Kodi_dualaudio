@@ -8,9 +8,6 @@ While the feature originated as a forum patch for older releases (Dharma/Eden), 
 
 Join the discussion and download the latest builds in the **[forum thread](http://forum.kodi.tv/showthread.php?tid=192480)**. For feedback and technical support, please reach out via **[email](mailto:newxhbl@hotmail.com)**.
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=TXMZR93BX5Y2Y&lc=US&item_name=Kodi%20Dual%20Audio%20Project&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
-
-
 ![Kodi Logo](docs/resources/banner.png)
 
 <p align="center">
@@ -94,3 +91,4 @@ Kodi is **[GPLv2 licensed](LICENSE.md)**. You may use, distribute and copy it un
 <a href="https://github.com/xbmc/xbmc"><img src="https://forthebadge.com/images/badges/approved-by-george-costanza.svg" height="25"></a>
 <a href="https://kodi.tv/download"><img src="https://forthebadge.com/images/badges/check-it-out.svg" height="25"></a>
 <a href="https://github.com/xbmc/xbmc"><img src="https://forthebadge.com/images/badges/winter-is-coming.svg" height="25"></a>
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E5B?style=flat&logo=ko-fi&logoColor=white)](https://ko-fi.com/newxhbl)
